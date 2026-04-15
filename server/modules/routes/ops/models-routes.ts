@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawn as childSpawn, execFile } from "node:child_process";
 import type { RuntimeContext } from "../../../types/runtime-context.ts";
 
 interface CliModelInfoServer {
@@ -62,11 +62,12 @@ export function registerModelRoutes(ctx: RuntimeContext): void {
     try {
       // pi --list-models writes to stderr, not stdout — capture it via spawn
       const piOutput = await new Promise<string>((resolve, reject) => {
-        const { spawn } = require("node:child_process");
-        const proc = spawn("pi", ["--list-models"], { stdio: ["ignore", "ignore", "pipe"], timeout: 15_000 });
+        const proc = childSpawn("pi", ["--list-models"], { stdio: ["ignore", "pipe", "pipe"], timeout: 15_000 });
+        let stdout = "";
         let stderr = "";
+        proc.stdout.on("data", (chunk: Buffer) => { stdout += chunk.toString(); });
         proc.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
-        proc.on("close", (code: number | null) => { code === 0 || code === 143 ? resolve(stderr) : reject(new Error("exit " + code)); });
+        proc.on("close", () => { resolve(stdout || stderr); });
         proc.on("error", reject);
       });
       const lines = piOutput.split(/\r?\n/);
