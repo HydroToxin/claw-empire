@@ -24,7 +24,7 @@ const INSTALL_AGENT_BY_PROVIDER: Record<InstallableProvider, string> = {
   gemini: "gemini-cli",
   opencode: "opencode",
   kimi: "kimi-code",
-  copilot: "github-copilot"
+  copilot: "github-copilot",
   antigravity: "antigravity",
   api: "api-provider",
   pi: "pi",
