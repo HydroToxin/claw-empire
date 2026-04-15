@@ -56,6 +56,38 @@ export function registerModelRoutes(ctx: RuntimeContext): void {
     }
   }
 
+
+  async function fetchPiModels(): Promise<CliModelInfoServer[]> {
+    const models: CliModelInfoServer[] = [];
+    try {
+      // pi --list-models writes to stderr, not stdout — capture it via spawn
+      const piOutput = await new Promise<string>((resolve, reject) => {
+        const { spawn } = require("node:child_process");
+        const proc = spawn("pi", ["--list-models"], { stdio: ["ignore", "ignore", "pipe"], timeout: 15_000 });
+        let stderr = "";
+        proc.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
+        proc.on("close", (code: number | null) => { code === 0 || code === 143 ? resolve(stderr) : reject(new Error("exit " + code)); });
+        proc.on("error", reject);
+      });
+      const lines = piOutput.split(/\r?\n/);
+      for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        const parts = line.split(/\s{2,}/);
+        if (parts.length >= 2) {
+          const provider = parts[0].trim();
+          const model = parts[1].trim();
+          if (provider && model) {
+            const slug = `${provider}/${model}`;
+            models.push({ slug, displayName: model, description: provider });
+          }
+        }
+      }
+    } catch {
+      // pi not available or --list-models failed
+    }
+    return models;
+  }
   async function fetchOpenCodeModels(): Promise<Record<string, string[]>> {
     const grouped: Record<string, string[]> = { opencode: [] };
     try {
@@ -223,6 +255,7 @@ export function registerModelRoutes(ctx: RuntimeContext): void {
       ].map(toModelInfo),
       gemini: fetchGeminiModels(),
       opencode: [],
+      pi: [],
     };
 
     const codexModels = readCodexModelsCache();
@@ -242,6 +275,13 @@ export function registerModelRoutes(ctx: RuntimeContext): void {
       if (ocList.length > 0) models.opencode = ocList.map(toModelInfo);
     } catch {
       // keep defaults
+    }
+
+    try {
+      const piModels = await fetchPiModels();
+      if (piModels.length > 0) models.pi = piModels;
+    } catch {
+      // keep empty pi models
     }
 
     cachedCliModels = { data: models, loadedAt: Date.now() };
