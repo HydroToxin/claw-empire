@@ -226,6 +226,14 @@ export function createUsageCliTools(deps: CreateUsageCliToolsDeps) {
     {
       name: "pi",
       authHint: "Pi uses system environment variables (e.g. ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.)",
+      getVersion: () => {
+        try {
+          const ver = execFileSync("pi", ["--version"], { encoding: "utf8", timeout: 3000 }).trim();
+          return ver || null;
+        } catch {
+          return null;
+        }
+      },
       checkAuth: () => {
         // Pi does not require separate auth — it reads standard provider API key env vars
         if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_OAUTH_TOKEN) return true;
