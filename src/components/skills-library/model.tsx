@@ -285,7 +285,7 @@ export function localizeAuditStatus(status: string, t: TFunction): string {
   return status;
 }
 
-export const LEARN_PROVIDER_ORDER: SkillLearnProvider[] = ["claude", "codex", "gemini", "opencode", "kimi"];
+export const LEARN_PROVIDER_ORDER: SkillLearnProvider[] = ["claude", "codex", "gemini", "opencode", "kimi", "pi"];
 export const LEARNED_PROVIDER_ORDER: SkillHistoryProvider[] = [
   "claude",
   "codex",

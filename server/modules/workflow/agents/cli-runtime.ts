@@ -113,6 +113,45 @@ export function createCliRuntimeTools(deps: CliRuntimeDeps) {
           }
         }
 
+        // Pi (pi-subagent extension): detect subagent spawn via toolcall_start with name="subagent"
+        if (j.type === "message_update" && j.assistantMessageEvent) {
+          const event = j.assistantMessageEvent as Record<string, unknown>;
+          if (event.type === "toolcall_start" && event.partial) {
+            const partial = event.partial as Record<string, unknown>;
+            const content = partial.content as unknown[] | undefined;
+            if (Array.isArray(content)) {
+              for (const part of content) {
+                if (
+                  typeof part === "object" &&
+                  part !== null &&
+                  (part as Record<string, unknown>).type === "toolCall" &&
+                  (part as Record<string, unknown>).name === "subagent"
+                ) {
+                  const tc = part as Record<string, unknown>;
+                  const toolCallId = String(tc.id || `pi-sub-${Date.now()}`);
+                  const existing = dbPrepareSubtaskByToolUseId().get(toolCallId) as { id: string } | undefined;
+                  if (!existing) {
+                    const args = (tc.arguments as Record<string, unknown>) || {};
+                    const agentName = (args.agent as string) || "subagent";
+                    const taskDesc = (args.task as string) || "Delegated task";
+                    const title = `[${agentName}] ${taskDesc.slice(0, 100)}`;
+                    createSubtaskFromCli(taskId, toolCallId, title);
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Pi: tool_execution_end → complete the subtask
+        if (j.type === "tool_execution_end") {
+          const toolCallId = j.toolCallId as string | undefined;
+          if (toolCallId) {
+            const existing = dbPrepareSubtaskByToolUseId().get(toolCallId) as { id: string } | undefined;
+            if (existing) completeSubtaskFromCli(toolCallId);
+          }
+        }
+
         // Gemini: plan-based subtask detection from message
         if (j.type === "message" && j.content) {
           const content = j.content as string;

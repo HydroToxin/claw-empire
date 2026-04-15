@@ -223,6 +223,20 @@ export function createUsageCliTools(deps: CreateUsageCliToolsDeps) {
         return false;
       },
     },
+    {
+      name: "pi",
+      authHint: "Pi uses system environment variables (e.g. ANTHROPIC_API_KEY, OPENAI_API_KEY, etc.)",
+      checkAuth: () => {
+        // Pi does not require separate auth — it reads standard provider API key env vars
+        if (process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_OAUTH_TOKEN) return true;
+        if (process.env.OPENAI_API_KEY) return true;
+        if (process.env.GEMINI_API_KEY) return true;
+        if (process.env.OPENROUTER_API_KEY) return true;
+        if (process.env.PI_CODING_AGENT_DIR) return true;
+        // If any provider env var is set, Pi can authenticate
+        return false;
+      },
+    },
   ];
 
   const cachedCliStatus: { data: CliStatusResult; loadedAt: number } | null = null;

@@ -9,6 +9,7 @@ export const CLI_INFO: Record<string, { label: string; icon: React.ReactNode }> 
   kimi: { label: "Kimi Code", icon: <CliKimiLogo /> },
   copilot: { label: "GitHub Copilot", icon: "🚀" },
   antigravity: { label: "Antigravity", icon: "🌌" },
+  pi: { label: "Pi", icon: "🥧" },
 };
 
 export const OAUTH_INFO: Record<string, { label: string }> = {

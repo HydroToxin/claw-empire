@@ -8,7 +8,7 @@ type DbLike = {
   };
 };
 
-type InstallableProvider = "claude" | "codex" | "gemini" | "opencode" | "kimi" | "copilot" | "antigravity";
+type InstallableProvider = "claude" | "codex" | "gemini" | "opencode" | "kimi" | "copilot" | "antigravity" | "api" | "pi";
 
 const REMOTION_SKILL_REPO = "remotion-dev/skills";
 const REMOTION_SKILL_ID = "remotion-best-practices";
@@ -24,8 +24,10 @@ const INSTALL_AGENT_BY_PROVIDER: Record<InstallableProvider, string> = {
   gemini: "gemini-cli",
   opencode: "opencode",
   kimi: "kimi-code",
-  copilot: "github-copilot",
+  copilot: "github-copilot"
   antigravity: "antigravity",
+  api: "api-provider",
+  pi: "pi",
 };
 
 const installFailCooldownUntilByProvider = new Map<string, number>();

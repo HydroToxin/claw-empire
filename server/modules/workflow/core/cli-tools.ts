@@ -100,6 +100,12 @@ export function createCliTools(deps: CreateCliToolsDeps) {
         args.push("--format", "json");
         return args;
       }
+      case "pi": {
+        const args = ["pi", "--print", "--mode", "json"];
+        if (model) args.push("--model", model);
+        if (noTools) args.push("--no-tools");
+        return args;
+      }
       case "copilot":
       case "antigravity":
         throw new Error(`${provider} uses HTTP agent (not CLI spawn)`);

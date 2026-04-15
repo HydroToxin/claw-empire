@@ -6,6 +6,7 @@ export const SKILL_LEARN_PROVIDER_TO_AGENT: Record<SkillLearnProvider, string> =
   gemini: "gemini-cli",
   opencode: "opencode",
   kimi: "kimi-code",
+  pi: "pi",
 };
 
 export const SKILL_HISTORY_PROVIDER_TO_AGENT: Record<SkillHistoryProvider, string | null> = {
@@ -31,7 +32,7 @@ export const SKILL_UNLEARN_TIMEOUT_MS = 20_000;
 export const SKILLS_NPX_CMD = process.platform === "win32" ? "npx.cmd" : "npx";
 
 export function isSkillLearnProvider(value: string): value is SkillLearnProvider {
-  return value === "claude" || value === "codex" || value === "gemini" || value === "opencode" || value === "kimi";
+  return value === "claude" || value === "codex" || value === "gemini" || value === "opencode" || value === "kimi" || value === "pi";
 }
 
 export function isSkillHistoryProvider(value: string): value is SkillHistoryProvider {

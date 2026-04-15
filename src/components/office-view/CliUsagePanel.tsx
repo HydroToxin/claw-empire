@@ -85,6 +85,13 @@ const CLI_DISPLAY: Array<{ key: string; name: string; icon: ReactNode; color: st
     color: "text-pink-300",
     bgColor: "bg-pink-500/15 border-pink-400/30",
   },
+  {
+    key: "pi",
+    name: "Pi",
+    icon: "🥧",
+    color: "text-orange-300",
+    bgColor: "bg-orange-500/15 border-orange-400/30",
+  },
 ];
 
 export default function CliUsagePanel({
